@@ -12,6 +12,7 @@ I use the following libs:
 - VAMP (for running NNLS)
 - curl (for getting mp3 streams)
 
+There's both visual and audiory outputs for debugging, but this also runs headless (ofAppNoWindow).
 
 license:  GPL   
 (note this project uses FFTW w/ VAMP, which is GPL)
