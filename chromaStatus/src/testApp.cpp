@@ -31,10 +31,10 @@ string uniqueName;
 //--------------------------------------------------------------
 void testApp::setup(){
     
-    ofSeedRandom(ofGetMinutes() + ofGetSeconds());
-    int random = ofRandom(0,100000);
-    //cout << random << endl;
-    //ofSeedRandom(77);
+//    ofSeedRandom(ofGetMinutes() + ofGetSeconds());
+//    int random = ofRandom(0,100000);
+//    //cout << random << endl;
+//    //ofSeedRandom(77);
     
     
     Poco::UUID uuid;
