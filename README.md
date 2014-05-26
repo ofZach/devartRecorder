@@ -14,7 +14,7 @@ I use the following libs:
 
 I use the following command line tools: 
 
-- sox (for normalizing audio and stats) 
+- sox (for normalizing audio and stats.  note this requires sox w/ lame) 
 - id3cp (for id3 tag copying)
 
 There's both visual and audiory outputs for debugging, but this also runs headless (ofAppNoWindow).
