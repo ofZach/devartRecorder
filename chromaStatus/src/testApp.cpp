@@ -44,6 +44,31 @@ void testApp::setup(){
     
     
     
+    //----------------------------------------------------------------------
+    for (int i = 0; i < 12; i++){
+        
+        string dirName = "output/" + ofToString(i);
+        ofDirectory dir(dirName);
+        if (!dir.exists()){
+            dir.create();
+        }
+        
+        for (int j = 0; j < 10; j++){
+            
+            string dirName = "output/" + ofToString(i) + "/" + ofToString(j);
+            ofDirectory dir(dirName);
+            if (!dir.exists()){
+                dir.create();
+                string commandGit = "touch " + ofToDataPath(dirName) + "/.gitkeep";
+                system(commandGit.c_str());
+            }
+            
+        }
+    }
+    
+    //std::exit(0);
+    
+    
     ofBuffer radioStationsBuffer = ofBufferFromFile("newRadio2.txt");
     
     vector < string > radios;
@@ -105,7 +130,31 @@ void testApp::setup(){
     MP3Stream.downloadUrl(url);
 }
 
-void testApp::saveFloatBuffer(vector < float > & audioData, int sampleRate, string fileName, chromaRecordingStats stats){
+
+std::string exec(const char* cmd) {
+    FILE* pipe = popen(cmd, "r");
+    if (!pipe) return "ERROR";
+    char buffer[128];
+    std::string result = "";
+    while(!feof(pipe)) {
+    	if(fgets(buffer, 128, pipe) != NULL)
+    		result += buffer;
+    }
+    pclose(pipe);
+    return result;
+}
+
+int freq2midi(float freq) {
+	return (int)( 69 + 12.0*log(freq/440.0)/log((float)2) );
+}
+
+int testApp::getMedianSpectralCentroid( string fileName ){
+    string command = "/usr/local/bin/sox '" + ofToDataPath(fileName) + "' -n stat 2>&1 | sed -n 's#^Rough [^0-9]*\\([0-9.]*\\)$#\\1#p' 2>&1 ";
+    string result = exec(command.c_str());
+    return freq2midi( ofToInt(result)/2) / 12;
+}
+
+void testApp::saveFloatBuffer(vector < float > & audioData, int sampleRate, int note, string fileName, chromaRecordingStats stats){
     
     
     Poco::UUID uuid;
@@ -116,6 +165,7 @@ void testApp::saveFloatBuffer(vector < float > & audioData, int sampleRate, stri
     string tempFileName = "temp/" + uniqueName + "-" + uniqueFileName + ".mp3";
     
     
+    cout << "start of save float" << endl;
     
     
     
@@ -131,11 +181,6 @@ void testApp::saveFloatBuffer(vector < float > & audioData, int sampleRate, stri
 //    } else {
 //        url = split[1];
 //    }
-    
-    
-
-    
-    
     
     
     FILE *mp3 = fopen( ofToDataPath(tempFileName).c_str(), "wb");
@@ -214,20 +259,63 @@ void testApp::saveFloatBuffer(vector < float > & audioData, int sampleRate, stri
     lame_close(lame);
     fclose(mp3);
     
+    
+    cout << "mid of save float" << endl;
+    
     // TODO:
     
     // SOX for octave splits...
     // SOX normalize  (MP3)  or use RMS and raw data...
     
     
-    string mvCommand = "mv " + ofToDataPath(tempFileName) + " " + ofToDataPath(fileName);
-    
-    system(mvCommand.c_str());
-    
-    cout << mvCommand << endl;
+    int octave = getMedianSpectralCentroid(tempFileName);
     
     
-    cout << "save " << fileName << endl;
+    //if (octave < 0) return; // ?
+    
+    
+    // add note and octave to filename
+    
+    fileName = "output/" + ofToString(note) + "/" + ofToString(octave) + "/" + fileName;
+    
+    
+    char soxMessage[512];
+    
+
+    sprintf(soxMessage, "/usr/local/bin/sox \"%s\" \"%s\" compand 0,0.1 -80.1,-inf,-80,-160,-48,-24,-24,-6,-12,-1.5,-6,-0.3 -1 -6 loudness",
+            ofToDataPath(tempFileName).c_str(), ofToDataPath(fileName).c_str());
+    
+    system(soxMessage);
+    
+    char id3cpMessage[512];
+    
+    sprintf(id3cpMessage, "/usr/local/bin/id3cp \"%s\" \"%s\"",
+            ofToDataPath(tempFileName).c_str(), ofToDataPath(fileName).c_str());
+    
+    system(id3cpMessage);
+
+
+    string deleteCommand = "rm " + ofToDataPath(tempFileName);
+    //system(deleteCommand.c_str());
+    
+    cout << "saved " << fileName <<  " " << tempFileName << endl;
+    
+    
+    //sox "$original_file" "$temp_file" compand 0,0.1 -80.1,-inf,-80,-160,-48,-24,-24,-6,-12,-1.5,-6,-0.3 -1 -6 loudness
+    //id3cp "$original_file" "$temp_file"
+    //mv "$temp_file" "$original_file"
+    
+    
+    
+    
+    
+    //string mvCommand = "mv " + ofToDataPath(tempFileName) + " " + ofToDataPath(fileName);
+    //system(mvCommand.c_str());
+    
+    //cout << mvCommand << endl;
+    
+    
+    //cout << "save " << fileName << endl;
     
     return 0;
     
@@ -266,8 +354,9 @@ void testApp::exportAudio(int startFrame, int endFrame, int note, chromaRecordin
         }
     }
     
+    cout << samplesForAudioRecording.size() << endl;
     //cout << samplesForAudioRecording.size() << endl;
-    if (samplesForAudioRecording.size() > 8192*2) saveFloatBuffer(samplesForAudioRecording, 44100, ofToString(note) + "/" + uniqueName + "-" + ofToString(startFrame) + ".mp3", stats);
+    if (samplesForAudioRecording.size() > 8192*2) saveFloatBuffer(samplesForAudioRecording, 44100, note, uniqueName + "-" + ofToString(startFrame) + ".mp3", stats);
     
     samplesForAudioRecording.clear();
     audioRecording.clear();
@@ -294,9 +383,6 @@ void testApp::getAudioData(float * audioData, int nSamples){
         for (int j = 0; j < 16384; j++){
             plugbuf[0][j] = samples[j];
         }
-        
-        
-
         
         
         samples.erase(samples.begin(), samples.begin()+2048);
@@ -397,11 +483,20 @@ void testApp::audioOut(float * output, int bufferSize, int nChannels){
 void testApp::update(){
     
     
-    if (ofGetElapsedTimef() > 15 && MP3Stream.getGotDataCount() < 2){
+    if (ofGetElapsedTimef() > 10 && MP3Stream.getGotDataCount() < 2){
         MP3Stream.shutDown();
         ofSleepMillis(30); // cleanup;
         std::exit(0);
     }
+ 
+    // quit out after 1.5 mins or so...
+    if (ofGetElapsedTimef() > 90){
+        MP3Stream.shutDown();
+        ofSleepMillis(30); // cleanup;
+        std::exit(0);
+    }
+    
+    
     //ofSetFrameRate(30);
     //cout << ofGetFrameRate() << endl;
     

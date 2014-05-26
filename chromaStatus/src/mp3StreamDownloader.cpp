@@ -30,9 +30,9 @@ size_t play_stream(void *buffer, size_t size, size_t nmemb, void *userp)
     
     gotDataCount++;
     
-//    if (gotDataCount << 8){
-//        cout << ".";
-//    }
+    if (gotDataCount << 8){
+        cout << ".";
+    }
 
     int err;
     off_t frame_offset;

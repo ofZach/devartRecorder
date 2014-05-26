@@ -41,7 +41,7 @@ class testApp : public ofBaseApp{
         void getAudioData(float * audioData, int nSamples);
         void audioOut(float * output, int bufferSize, int nChannels);
         void exportAudio(int startFrame, int endFrame, int note, chromaRecordingStats stats);
-        void saveFloatBuffer(vector < float > & audioData, int sampleRate, string fileName, chromaRecordingStats stats);
+        void saveFloatBuffer(vector < float > & audioData, int sampleRate, int note, string fileName, chromaRecordingStats stats);
     
         mp3StreamDownloader MP3Stream;
         ofMutex lock3;
@@ -58,6 +58,9 @@ class testApp : public ofBaseApp{
         vector < float > samples;
         vector < chormaData > chromaDatas;
         chromaNoteSegmenter segmenter;
+    
+    
+        int getMedianSpectralCentroid( string fileName );
     
     
         radioInfo RI;
