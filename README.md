@@ -12,6 +12,11 @@ I use the following libs:
 - VAMP (for running NNLS)
 - curl (for getting mp3 streams)
 
+I use the following command line tools: 
+
+- sox (for normalizing audio and stats) 
+- id3cp (for id3 tag copying)
+
 There's both visual and audiory outputs for debugging, but this also runs headless (ofAppNoWindow).
 
 license:  GPL   
