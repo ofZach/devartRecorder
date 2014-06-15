@@ -66,7 +66,7 @@ size_t play_stream(void *buffer, size_t size, size_t nmemb, void *userp)
     int channels, encoding;
     long rate;
     
-    float * values;
+    float * values = NULL;
     
     //cout << "." << endl;
     
@@ -94,11 +94,11 @@ size_t play_stream(void *buffer, size_t size, size_t nmemb, void *userp)
                 // only reallocate on new stuff.
                 
                 //printf("got chunk \n");
-                values  = new float[done / 4];
+                if (values == NULL) values  = new float[done / 4];
                 memcpy((char *)values, audio, done);
                 ((testApp *) ofGetAppPtr())->getAudioData(values, done/4);
                 nSamples += done/4;
-                delete [] values;
+                //delete [] values;
                 break;
             case MPG123_NEED_MORE:
                 break;
