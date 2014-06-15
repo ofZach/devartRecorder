@@ -171,7 +171,6 @@ public:
         
         while( isThreadRunning() != 0 ){
             curl_easy_perform(curl);
-           
         }
         
     }
@@ -183,8 +182,8 @@ curlThreaded * CT;
 
 
 void mp3StreamDownloader::shutDown(){
-    CT->stop();
-    delete CT;
+    //CT->stop();
+    //delete CT;
 }
 
 
