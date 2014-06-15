@@ -3,6 +3,8 @@
 #NO MP3s :) otherwise insanisty
 *.mp3
 *.MP3
+*/bin/data*.txt
+
 
 # Some general ignore patterns
 build/
