@@ -3,7 +3,7 @@
 #NO MP3s :) otherwise insanisty
 *.mp3
 *.MP3
-*/bin/data*.txt
+chromaStatus/bin/data/logs/*.txt
 
 
 # Some general ignore patterns
