@@ -1,6 +1,7 @@
 import threading
 import subprocess
-
+import os, signal
+from time import sleep
 
 class MyClass(threading.Thread):
 
@@ -18,15 +19,15 @@ class MyClass(threading.Thread):
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE)
             p.wait()
+	    if p.poll() is None:
+	    	print "killing process: %d" % p.pid
+	    	os.kill(p.pid, signal.SIGTERM)
+
         
-
-
-
-
 
 print "starting"
 
-for x in range(0, 60):
+for x in range(0, 50):
     myclass = MyClass()
     myclass.start()
 

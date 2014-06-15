@@ -81,7 +81,7 @@
 PROJECT_LDFLAGS=-Wl,-rpath=./libs:/usr/lib:/usr/local/lib
 PROJECT_LDFLAGS += -lcurl
 PROJECT_LDFLAGS += -lmp3lame
-PROJECT_LDFLAGS += -lfftw3fsdfasdfasdf
+PROJECT_LDFLAGS += -lfftw3f
 PROJECT_LDFLAGS += -lvamp-hostsdk
 PROJECT_LDFLAGS += -L/usr/local/lib/libvamp-sdk.a
 PROJECT_LDFLAGS += -L/usr/local/lib/libvamp-hostsdk.a

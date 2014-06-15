@@ -159,11 +159,15 @@ void chromaNoteSegmenter::processRecordingLogic(){
             
         }
         
+        ofLog(OF_LOG_NOTICE) << "recording strength " << myVolume;
+        
         if (myVolume > 0.65){
         stats.myStrength = myVolume;
         stats.theirStrength = theirVolume;
         stats.duration = (recordings[i].endFrame -recordings[i].startFrame) * 2048.0 / 44100.0;
         
+        ofLog(OF_LOG_NOTICE) << "outputting recording " << myVolume;
+            
         //cout << myVolume << " " << theirVolume << endl;
         
         app->exportAudio(recordings[i].startFrame, recordings[i].endFrame, recordings[i].note, stats);

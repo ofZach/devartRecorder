@@ -6,9 +6,11 @@
 //
 //
 
+
 #include "mp3StreamDownloader.h"
 #include "curl/curl.h"
 #include "mpg123.h"
+#include "ofMain.h"
 #include "testApp.h"
 
 
@@ -34,11 +36,13 @@ void calculateFPS(){
     //  Calculate time passed
     int timeInterval = currentTime - previousTime;
     
+string timestamp = ofGetTimestampString();
     
     if(timeInterval > 1000){
         //  calculate the number of frames per second
         float sampleFPS = nSamples / (float)(timeInterval / 1000.0);
-        ofLog(OF_LOG_NOTICE) << sampleFPS << " samples per second ";
+
+        ofLog(OF_LOG_NOTICE) << timestamp << " - " << sampleFPS << " samples per second ";
         //  Set time
         previousTime = currentTime;
         nSamples = 0;
@@ -57,8 +61,11 @@ size_t play_stream(void *buffer, size_t size, size_t nmemb, void *userp)
     
     gotDataCount++;
     
-    
+//  calculateFps();
+  calculateFPS();
 
+    ofLog(OF_LOG_NOTICE) << "received data, size is " << size * nmemb;
+//cout << "got data" << ofGetTimestampString() << endl;
     int err;
     off_t frame_offset;
     unsigned char *audio;

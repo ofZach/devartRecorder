@@ -88,45 +88,46 @@ void testApp::setup(){
         if (radioStationsBuffer.isLastLine()) break;
     }
     
-    radioLine = radios[ (int)ofRandom(0,radios.size()) % radios.size()];
-    
-    
-    cout << radioLine << endl;
-    vector < string >  split = ofSplitString(radioLine, "///", true);
-    
     string url = "";
-    if (split[1].find("||") != string::npos){
-        vector < string > urls = ofSplitString(split[1], "||");
-        url = urls[ (int)ofRandom(0,urls.size() + 100) % urls.size() ];
-    } else {
-        url = split[1];
-    }
     
-    
-    string fileName = ofToDataPath("curl/" + uniqueName + "_curlTest.mp3");
-    string command = "curl -sS -o " + fileName + " -m 1 " + url;
-    
-    cout << " hello " << endl;
-    //cout << fileName << endl;
-    system(command.c_str());
-    cout << " world " << endl;
-    
-    
-    
-    ofFile file (fileName);
-    
-    if (file.exists()){
-        cout << "file size " << file.getSize()  << endl;
-        if (file.getSize() > 1000){
-            file.remove();
+    while (true){
+        radioLine = radios[ (int)ofRandom(0,radios.size()) % radios.size()];
+        cout << radioLine << endl;
+        vector < string >  split = ofSplitString(radioLine, "///", true);
+        
+        if (split[1].find("||") != string::npos){
+            vector < string > urls = ofSplitString(split[1], "||");
+            url = urls[ (int)ofRandom(0,urls.size() + 100) % urls.size() ];
         } else {
-            file.remove();
-            cout << fileName << " too small " << endl;
-            std::exit(0);
+            url = split[1];
         }
-    } else {
-        cout << fileName << " doesn't exist " << endl;
-        std::exit(0);
+        string fileName = ofToDataPath("curl/" + uniqueName + "_curlTest.mp3");
+        string command = "curl -sS -o " + fileName + " -m 1 " + url;
+        
+        //cout << " hello " << endl;
+        //cout << fileName << endl;
+        system(command.c_str());
+        //cout << " world " << endl;
+
+        ofFile file (fileName);
+        
+        if (file.exists()){
+            cout << "file size " << file.getSize()  << endl;
+            if (file.getSize() > 1000){
+                file.remove();
+                break;
+            } else {
+                file.remove();
+                cout << fileName << " too small " << endl;
+                
+                //std::exit(0);
+            }
+        } else {
+            cout << fileName << " doesn't exist " << endl;
+            //std::exit(0);
+        }
+        ofSleepMillis(500);
+        
     }
     
     ofLogToFile("logs/" + uniqueName + ".log.txt");
@@ -401,26 +402,40 @@ void testApp::exportAudio(int startFrame, int endFrame, int note, chromaRecordin
     
     vector < float > samplesForAudioRecording;
     
+    
+    
+    
     for (int i = 0; i < audioRecording.size(); i++){
         
         if (audioRecording[i].frameNum >=startFrame &&
             audioRecording[i].frameNum <= endFrame){
             samplesForAudioRecording.insert(samplesForAudioRecording.end(), audioRecording[i].data, audioRecording[i].data + 2048);
+            
+            
+            
         }
     }
     
+    ofLog(OF_LOG_NOTICE) << "audio recoding size " << audioRecording.size();
+    if (audioRecording.size() > 0){
+        ofLog(OF_LOG_NOTICE) << "audio recording a " << audioRecording[0].frameNum << " b " << audioRecording[audioRecording.size()-1].frameNum;
+        
+    }
+    ofLog(OF_LOG_NOTICE) << "start frame end frame duration " << startFrame << " " << endFrame << " " << samplesForAudioRecording.size() <<endl;
+    
     //cout << samplesForAudioRecording.size() << endl;
     //cout << samplesForAudioRecording.size() << endl;
-    if (samplesForAudioRecording.size() > 8192*2) saveFloatBuffer(samplesForAudioRecording, 44100, note, uniqueName + "-" + ofToString(startFrame) + ".mp3", stats);
+    if (samplesForAudioRecording.size() > 2048 * 8) saveFloatBuffer(samplesForAudioRecording, 44100, note, uniqueName + "-" + ofToString(startFrame) + ".mp3", stats);
     
     samplesForAudioRecording.clear();
-    audioRecording.clear();
+    //audioRecording.clear();
     
     
 }
 
 
 
+int nFramesNonRecording = 0;
 void testApp::getAudioData(float * audioData, int nSamples){
    
     
@@ -466,6 +481,7 @@ void testApp::getAudioData(float * audioData, int nSamples){
                 
                 bool bShouldIRecord = segmenter.bAnyRecording();
                 if (bShouldIRecord == true){
+                    nFramesNonRecording = 0;
                     int mid = 16384/8;
                     int start = mid - 2048/2;
                     int end = start + 2048;
@@ -476,7 +492,11 @@ void testApp::getAudioData(float * audioData, int nSamples){
                     }
                     audioRecording.push_back(FA);
                 } else {
-                    audioRecording.clear();
+                    nFramesNonRecording ++;
+                    if (nFramesNonRecording > 3){
+                        audioRecording.clear();
+                    }
+                 
                 }
                 
                 segmenter.processRecordingLogic();
@@ -533,13 +553,24 @@ void testApp::audioOut(float * output, int bufferSize, int nChannels){
 
 
 
-
+int lastDataCount = 0;
+int consecutiveZeroCount = 0;
 //--------------------------------------------------------------
 void testApp::update(){
     
+
+    
+    int currentDataCount = MP3Stream.getGotDataCount();
+    
+    if (currentDataCount == 0) consecutiveZeroCount++;
+    else consecutiveZeroCount = 0;
+    
+    ofLog(OF_LOG_NOTICE) << "update at " << ofGetTimestampString() << " data count " << currentDataCount - lastDataCount;
+    lastDataCount = currentDataCount;
     
     
-    if (ofGetElapsedTimef() > 15 && MP3Stream.getGotDataCount() < 2){
+    
+    if (consecutiveZeroCount > 6){
         MP3Stream.shutDown();
         ofSleepMillis(30); // cleanup;
         ofFile file("logs/" + uniqueName + ".log.txt");
@@ -550,11 +581,14 @@ void testApp::update(){
     }
  
     // quit out after 1.5 mins or so...
-    if (ofGetElapsedTimef() > 180){
+    if (ofGetElapsedTimef() > 60){
         MP3Stream.shutDown();
-        ofSleepMillis(30); // cleanup;
+        ofFile file("logs/" + uniqueName + ".log.txt");
+        file.remove();
+	ofSleepMillis(30); // cleanup;
         std::exit(0);
     }
+    
     
     
     //ofSetFrameRate(30);
