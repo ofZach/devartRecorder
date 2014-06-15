@@ -39,6 +39,8 @@ void calculateFPS(){
         //  calculate the number of frames per second
         float sampleFPS = nSamples / (float)(timeInterval / 1000.0);
         ofLog(OF_LOG_NOTICE) << sampleFPS << " samples per second ";
+        
+        //cout << sampleFPS << " samples per second " << endl;
         //  Set time
         previousTime = currentTime;
         nSamples = 0;
@@ -56,6 +58,7 @@ size_t play_stream(void *buffer, size_t size, size_t nmemb, void *userp)
     
     
     gotDataCount++;
+    
     
     
 
@@ -107,6 +110,12 @@ size_t play_stream(void *buffer, size_t size, size_t nmemb, void *userp)
         }
     } while(done > 0);
     
+    
+    
+    //cout << "got data " << endl;
+    ofSleepMillis(ofRandom(80,120));                                              // <----- this is adjustable.  worth experimenting with
+    calculateFPS();
+    
     // this kills curl ... do we need a delay before cleanup?
     if (bAbort == false){
         return size * nmemb;
@@ -114,6 +123,7 @@ size_t play_stream(void *buffer, size_t size, size_t nmemb, void *userp)
         bAbort = false;
         return -1;
     }
+    
 }
 
 
@@ -153,16 +163,15 @@ public:
         
         bAbort = false;
         curl = curl_easy_init();
-        multi_handle = curl_multi_init();
+        //multi_handle = curl_multi_init();
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, play_stream);
         curl_easy_setopt(curl, CURLOPT_BUFFERSIZE,1152*30);                 // <----- this is adjustable.  worth experimenting with
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-        curl_multi_add_handle(multi_handle, curl);
+        //curl_multi_add_handle(multi_handle, curl);
         
         while( isThreadRunning() != 0 ){
-            curl_multi_perform(multi_handle, &handle_count);
-            ofSleepMillis(ofRandom(80,120));                                              // <----- this is adjustable.  worth experimenting with
-            calculateFPS();
+            curl_easy_perform(curl);
+           
         }
         
     }

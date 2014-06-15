@@ -538,6 +538,7 @@ void testApp::audioOut(float * output, int bufferSize, int nChannels){
 void testApp::update(){
     
     
+    
     if (ofGetElapsedTimef() > 15 && MP3Stream.getGotDataCount() < 2){
         MP3Stream.shutDown();
         ofSleepMillis(30); // cleanup;

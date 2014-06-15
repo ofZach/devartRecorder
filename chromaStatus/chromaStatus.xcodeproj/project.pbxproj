@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		92611A28194D392B00CC509F /* libmp3lame.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 92611A25194D392B00CC509F /* libmp3lame.0.dylib */; };
+		92611A29194D392B00CC509F /* libmp3lame.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 92611A26194D392B00CC509F /* libmp3lame.a */; };
+		92611A2A194D392B00CC509F /* libmp3lame.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 92611A27194D392B00CC509F /* libmp3lame.dylib */; };
 		92632B921923138F007DEE83 /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 92632B8C1923138F007DEE83 /* libcurl.a */; };
 		92632B99192778BE007DEE83 /* fftw3f.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 92632B98192778BE007DEE83 /* fftw3f.a */; };
 		92632BA01927802A007DEE83 /* mp3StreamDownloader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 92632B9E1927802A007DEE83 /* mp3StreamDownloader.cpp */; };
@@ -22,10 +25,6 @@
 		926497A318FF1C410076995B /* PluginSummarisingAdapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9264979718FF1C410076995B /* PluginSummarisingAdapter.cpp */; };
 		926497A418FF1C410076995B /* PluginWrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9264979918FF1C410076995B /* PluginWrapper.cpp */; };
 		927874AE192BF08000C439E8 /* chromaNoteSegmenter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 927874AC192BF08000C439E8 /* chromaNoteSegmenter.cpp */; };
-		927874CD192D98F400C439E8 /* libmp3lame.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 927874CA192D98F400C439E8 /* libmp3lame.0.dylib */; };
-		927874CE192D98F400C439E8 /* libmp3lame.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 927874CB192D98F400C439E8 /* libmp3lame.a */; };
-		927874CF192D98F400C439E8 /* libmp3lame.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 927874CC192D98F400C439E8 /* libmp3lame.dylib */; };
-		927874D2192D992B00C439E8 /* libmp3lame.0.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 927874CA192D98F400C439E8 /* libmp3lame.0.dylib */; };
 		927874DF19317DB300C439E8 /* ofAppNoWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 927874DD19317DB300C439E8 /* ofAppNoWindow.cpp */; };
 		92A2FBB718F30D9000930ECB /* chorddict.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 92A2FBA818F30D9000930ECB /* chorddict.cpp */; };
 		92A2FBB818F30D9000930ECB /* Chordino.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 92A2FBA918F30D9000930ECB /* Chordino.cpp */; };
@@ -80,7 +79,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
-				927874D2192D992B00C439E8 /* libmp3lame.0.dylib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -97,6 +95,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		92611A25194D392B00CC509F /* libmp3lame.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libmp3lame.0.dylib; sourceTree = "<group>"; };
+		92611A26194D392B00CC509F /* libmp3lame.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libmp3lame.a; sourceTree = "<group>"; };
+		92611A27194D392B00CC509F /* libmp3lame.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libmp3lame.dylib; sourceTree = "<group>"; };
 		92632B871923138F007DEE83 /* curl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = curl.h; sourceTree = "<group>"; };
 		92632B881923138F007DEE83 /* curlbuild.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = curlbuild.h; sourceTree = "<group>"; };
 		92632B891923138F007DEE83 /* curlrules.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = curlrules.h; sourceTree = "<group>"; };
@@ -142,9 +143,6 @@
 		927874AD192BF08000C439E8 /* chromaNoteSegmenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = chromaNoteSegmenter.h; sourceTree = "<group>"; };
 		927874AF192C00C700C439E8 /* chromaDataTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = chromaDataTypes.h; sourceTree = "<group>"; };
 		927874C8192D98F400C439E8 /* lame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lame.h; sourceTree = "<group>"; };
-		927874CA192D98F400C439E8 /* libmp3lame.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libmp3lame.0.dylib; sourceTree = "<group>"; };
-		927874CB192D98F400C439E8 /* libmp3lame.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libmp3lame.a; sourceTree = "<group>"; };
-		927874CC192D98F400C439E8 /* libmp3lame.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libmp3lame.dylib; sourceTree = "<group>"; };
 		927874DD19317DB300C439E8 /* ofAppNoWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ofAppNoWindow.cpp; path = ../../../../libs/openFrameworks/app/ofAppNoWindow.cpp; sourceTree = "<group>"; };
 		927874DE19317DB300C439E8 /* ofAppNoWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofAppNoWindow.h; path = ../../../../libs/openFrameworks/app/ofAppNoWindow.h; sourceTree = "<group>"; };
 		92A2FBA818F30D9000930ECB /* chorddict.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chorddict.cpp; sourceTree = "<group>"; };
@@ -192,16 +190,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				E7F985F815E0DEA3003869B5 /* Accelerate.framework in Frameworks */,
-				927874CD192D98F400C439E8 /* libmp3lame.0.dylib in Frameworks */,
+				92611A28194D392B00CC509F /* libmp3lame.0.dylib in Frameworks */,
 				E7E077E815D3B6510020DFD4 /* QTKit.framework in Frameworks */,
 				E4EB6799138ADC1D00A09F29 /* GLUT.framework in Frameworks */,
-				927874CF192D98F400C439E8 /* libmp3lame.dylib in Frameworks */,
+				92611A2A194D392B00CC509F /* libmp3lame.dylib in Frameworks */,
 				92632B99192778BE007DEE83 /* fftw3f.a in Frameworks */,
 				E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */,
 				E45BE97B0E8CC7DD009D7055 /* AGL.framework in Frameworks */,
 				E45BE97C0E8CC7DD009D7055 /* ApplicationServices.framework in Frameworks */,
 				E45BE97D0E8CC7DD009D7055 /* AudioToolbox.framework in Frameworks */,
-				927874CE192D98F400C439E8 /* libmp3lame.a in Frameworks */,
+				92611A29194D392B00CC509F /* libmp3lame.a in Frameworks */,
 				9264974618FE9F8C0076995B /* libvamp-hostsdk.dylib in Frameworks */,
 				92632B921923138F007DEE83 /* libcurl.a in Frameworks */,
 				E45BE97E0E8CC7DD009D7055 /* Carbon.framework in Frameworks */,
@@ -342,9 +340,9 @@
 		927874C9192D98F400C439E8 /* lib */ = {
 			isa = PBXGroup;
 			children = (
-				927874CA192D98F400C439E8 /* libmp3lame.0.dylib */,
-				927874CB192D98F400C439E8 /* libmp3lame.a */,
-				927874CC192D98F400C439E8 /* libmp3lame.dylib */,
+				92611A25194D392B00CC509F /* libmp3lame.0.dylib */,
+				92611A26194D392B00CC509F /* libmp3lame.a */,
+				92611A27194D392B00CC509F /* libmp3lame.dylib */,
 			);
 			path = lib;
 			sourceTree = "<group>";
@@ -766,6 +764,7 @@
 					/Users/zach/Documents/OF/of_v0.8.0_osx_release/apps/myApps/chromaStatus3/src/curl,
 					/Users/zach/Documents/OF/of_v0.8.0_osx_release/apps/myApps/chromaStatus3/src/fftw,
 					/Users/zach/Documents/OF/of_v0.8.0_osx_release/apps/myApps/chromaStatus4/src/lame/lib,
+					"/Users/zach/Documents/OF/of_v0.8.1-RC1_osx_release/apps/devartRecorder/chromaStatus/src/lame/lib",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)Debug";
 				WRAPPER_EXTENSION = app;
@@ -856,6 +855,7 @@
 					/Users/zach/Documents/OF/of_v0.8.0_osx_release/apps/myApps/chromaStatus3/src/curl,
 					/Users/zach/Documents/OF/of_v0.8.0_osx_release/apps/myApps/chromaStatus3/src/fftw,
 					/Users/zach/Documents/OF/of_v0.8.0_osx_release/apps/myApps/chromaStatus4/src/lame/lib,
+					"/Users/zach/Documents/OF/of_v0.8.1-RC1_osx_release/apps/devartRecorder/chromaStatus/src/lame/lib",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
