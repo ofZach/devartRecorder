@@ -22,6 +22,8 @@ _VampHost::Vamp::HostExt::PluginInputDomainAdapter * pluginAdapter;
 //
 
 
+float restartRate;
+
 using Vamp::Plugin;
 using Vamp::RealTime;
 
@@ -44,29 +46,36 @@ void testApp::setup(){
     
     
     
-    //----------------------------------------------------------------------
-    for (int i = 0; i < 12; i++){
-        
-        string dirName = "output/" + ofToString(i);
-        ofDirectory dir(dirName);
-        if (!dir.exists()){
-            dir.create();
-        }
-        
-        for (int j = 0; j < 10; j++){
-            
-            string dirName = "output/" + ofToString(i) + "/" + ofToString(j);
-            ofDirectory dir(dirName);
-            if (!dir.exists()){
-                dir.create();
-                string commandGit = "touch " + ofToDataPath(dirName) + "/.gitkeep";
-                system(commandGit.c_str());
-            }
-            
-        }
-    }
     
-    //std::exit(0);
+    
+    
+    
+    restartRate = ofRandom(5,10);
+    
+    
+//    //----------------------------------------------------------------------
+//    for (int i = 0; i < 12; i++){
+//        
+//        string dirName = "output/" + ofToString(i);
+//        ofDirectory dir(dirName);
+//        if (!dir.exists()){
+//            dir.create();
+//        }
+//        
+//        for (int j = 0; j < 10; j++){
+//            
+//            string dirName = "output/" + ofToString(i) + "/" + ofToString(j);
+//            ofDirectory dir(dirName);
+//            if (!dir.exists()){
+//                dir.create();
+//                string commandGit = "touch " + ofToDataPath(dirName) + "/.gitkeep &";
+//                system(commandGit.c_str());
+//            }
+//            
+//        }
+//    }
+//    
+//    std::exit(0);
     
     
     ofBuffer radioStationsBuffer = ofBufferFromFile("newRadio2.txt");
@@ -93,6 +102,35 @@ void testApp::setup(){
         url = split[1];
     }
     
+    
+    string fileName = ofToDataPath("curl/" + uniqueName + "_curlTest.mp3");
+    string command = "curl -sS -o " + fileName + " -m 1 " + url;
+    
+    cout << " hello " << endl;
+    //cout << fileName << endl;
+    system(command.c_str());
+    cout << " world " << endl;
+    
+    
+    
+    ofFile file (fileName);
+    
+    if (file.exists()){
+        cout << "file size " << file.getSize()  << endl;
+        if (file.getSize() > 1000){
+            file.remove();
+        } else {
+            file.remove();
+            cout << fileName << " too small " << endl;
+            std::exit(0);
+        }
+    } else {
+        cout << fileName << " doesn't exist " << endl;
+        std::exit(0);
+    }
+    
+    ofLogToFile("logs/" + uniqueName + ".log.txt");
+    ofLog(OF_LOG_NOTICE) << radioLine;
     
     
     ofSetVerticalSync(false);
@@ -149,8 +187,16 @@ int freq2midi(float freq) {
 }
 
 int testApp::getMedianSpectralCentroid( string fileName ){
+    //string command = "/usr/local/bin/sox '" + ofToDataPath(fileName) + "' -n stat 2>&1 | sed -n 's#^Rough [^0-9]*\\([0-9.]*\\)$#\\1#p' 2>&1 ";
+#ifdef TARGET_OSX
+    
     string command = "/usr/local/bin/sox '" + ofToDataPath(fileName) + "' -n stat 2>&1 | sed -n 's#^Rough [^0-9]*\\([0-9.]*\\)$#\\1#p' 2>&1 ";
-    string result = exec(command.c_str());
+#else 
+    string command = "/usr/bin/sox '" + ofToDataPath(fileName) + "' -n stat 2>&1 | sed -n 's#^Rough [^0-9]*\\([0-9.]*\\)$#\\1#p' 2>&1 ";
+
+#endif    
+
+string result = exec(command.c_str());
     return freq2midi( ofToInt(result)/2) / 12;
 }
 
@@ -165,7 +211,7 @@ void testApp::saveFloatBuffer(vector < float > & audioData, int sampleRate, int 
     string tempFileName = "temp/" + uniqueName + "-" + uniqueFileName + ".mp3";
     
     
-    cout << "start of save float" << endl;
+    //cout << "start of save float" << endl;
     
     
     
@@ -282,23 +328,32 @@ void testApp::saveFloatBuffer(vector < float > & audioData, int sampleRate, int 
     char soxMessage[512];
     
 
+#ifdef TARGET_OSX
     sprintf(soxMessage, "/usr/local/bin/sox \"%s\" \"%s\" compand 0,0.1 -80.1,-inf,-80,-160,-48,-24,-24,-6,-12,-1.5,-6,-0.3 -1 -6 loudness",
             ofToDataPath(tempFileName).c_str(), ofToDataPath(fileName).c_str());
+#else
+    sprintf(soxMessage, "/usr/bin/sox \"%s\" \"%s\" compand 0,0.1 -80.1,-inf,-80,-160,-48,-24,-24,-6,-12,-1.5,-6,-0.3 -1 -6 loudness",
+            ofToDataPath(tempFileName).c_str(), ofToDataPath(fileName).c_str());
+#endif
     
     system(soxMessage);
     
     char id3cpMessage[512];
     
+#ifdef TARGET_OSX
     sprintf(id3cpMessage, "/usr/local/bin/id3cp \"%s\" \"%s\"",
             ofToDataPath(tempFileName).c_str(), ofToDataPath(fileName).c_str());
-    
+#else
+    sprintf(id3cpMessage, "/usr/bin/id3cp \"%s\" \"%s\"",
+            ofToDataPath(tempFileName).c_str(), ofToDataPath(fileName).c_str());
+#endif    
     system(id3cpMessage);
 
 
     string deleteCommand = "rm " + ofToDataPath(tempFileName);
     //system(deleteCommand.c_str());
     
-    cout << "saved " << fileName <<  " " << tempFileName << endl;
+    ofLog(OF_LOG_NOTICE) << "saved " << fileName <<  " " << tempFileName;
     
     
     //sox "$original_file" "$temp_file" compand 0,0.1 -80.1,-inf,-80,-160,-48,-24,-24,-6,-12,-1.5,-6,-0.3 -1 -6 loudness
@@ -317,7 +372,7 @@ void testApp::saveFloatBuffer(vector < float > & audioData, int sampleRate, int 
     
     //cout << "save " << fileName << endl;
     
-    return 0;
+    return;
     
     
     
@@ -354,7 +409,7 @@ void testApp::exportAudio(int startFrame, int endFrame, int note, chromaRecordin
         }
     }
     
-    cout << samplesForAudioRecording.size() << endl;
+    //cout << samplesForAudioRecording.size() << endl;
     //cout << samplesForAudioRecording.size() << endl;
     if (samplesForAudioRecording.size() > 8192*2) saveFloatBuffer(samplesForAudioRecording, 44100, note, uniqueName + "-" + ofToString(startFrame) + ".mp3", stats);
     
@@ -483,14 +538,18 @@ void testApp::audioOut(float * output, int bufferSize, int nChannels){
 void testApp::update(){
     
     
-    if (ofGetElapsedTimef() > 10 && MP3Stream.getGotDataCount() < 2){
+    if (ofGetElapsedTimef() > 15 && MP3Stream.getGotDataCount() < 2){
         MP3Stream.shutDown();
         ofSleepMillis(30); // cleanup;
+        ofFile file("logs/" + uniqueName + ".log.txt");
+        file.remove();
+        //ofLogToFile("logs/" + uniqueName + ".log.txt");
+               
         std::exit(0);
     }
  
     // quit out after 1.5 mins or so...
-    if (ofGetElapsedTimef() > 90){
+    if (ofGetElapsedTimef() > 180){
         MP3Stream.shutDown();
         ofSleepMillis(30); // cleanup;
         std::exit(0);

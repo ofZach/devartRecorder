@@ -159,6 +159,7 @@ void chromaNoteSegmenter::processRecordingLogic(){
             
         }
         
+        if (myVolume > 0.65){
         stats.myStrength = myVolume;
         stats.theirStrength = theirVolume;
         stats.duration = (recordings[i].endFrame -recordings[i].startFrame) * 2048.0 / 44100.0;
@@ -166,6 +167,7 @@ void chromaNoteSegmenter::processRecordingLogic(){
         //cout << myVolume << " " << theirVolume << endl;
         
         app->exportAudio(recordings[i].startFrame, recordings[i].endFrame, recordings[i].note, stats);
+        }
         
     }
     

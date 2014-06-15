@@ -22,6 +22,33 @@ int mp3StreamDownloader::getGotDataCount(){
 }
 
 
+int currentTime = 0;
+int count = 0;
+int previousTime = 0;
+int nSamples = 0;
+
+void calculateFPS(){
+    
+    currentTime = ofGetElapsedTimeMillis();
+    
+    //  Calculate time passed
+    int timeInterval = currentTime - previousTime;
+    
+    
+    if(timeInterval > 1000){
+        //  calculate the number of frames per second
+        float sampleFPS = nSamples / (float)(timeInterval / 1000.0);
+        ofLog(OF_LOG_NOTICE) << sampleFPS << " samples per second ";
+        //  Set time
+        previousTime = currentTime;
+        nSamples = 0;
+    }
+}
+//-------------------------------------------------------------------------------
+
+
+
+
 
 //-----------------------------------------------------------------------------------------
 size_t play_stream(void *buffer, size_t size, size_t nmemb, void *userp)
@@ -30,9 +57,7 @@ size_t play_stream(void *buffer, size_t size, size_t nmemb, void *userp)
     
     gotDataCount++;
     
-    if (gotDataCount << 8){
-        cout << ".";
-    }
+    
 
     int err;
     off_t frame_offset;
@@ -65,13 +90,14 @@ size_t play_stream(void *buffer, size_t size, size_t nmemb, void *userp)
                 
             case MPG123_OK:
                 
-                // TODO: THIS CAN BE OPTIMIZED
+                // TODO: THIS CAN BE OPTIMIZED  ( no create delete!)
                 // only reallocate on new stuff.
                 
                 //printf("got chunk \n");
                 values  = new float[done / 4];
                 memcpy((char *)values, audio, done);
                 ((testApp *) ofGetAppPtr())->getAudioData(values, done/4);
+                nSamples += done/4;
                 delete [] values;
                 break;
             case MPG123_NEED_MORE:
@@ -129,13 +155,14 @@ public:
         curl = curl_easy_init();
         multi_handle = curl_multi_init();
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, play_stream);
-        curl_easy_setopt(curl, CURLOPT_BUFFERSIZE,1152*10);                 // <----- this is adjustable.  worth experimenting with
+        curl_easy_setopt(curl, CURLOPT_BUFFERSIZE,1152*30);                 // <----- this is adjustable.  worth experimenting with
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_multi_add_handle(multi_handle, curl);
         
         while( isThreadRunning() != 0 ){
             curl_multi_perform(multi_handle, &handle_count);
-            ofSleepMillis(40);                                              // <----- this is adjustable.  worth experimenting with
+            ofSleepMillis(ofRandom(80,120));                                              // <----- this is adjustable.  worth experimenting with
+            calculateFPS();
         }
         
     }

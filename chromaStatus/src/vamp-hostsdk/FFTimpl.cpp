@@ -1,4 +1,4 @@
-
+#include <cmath>
 /* Public domain FFT implementation from Don Cross. */
 
 static void
@@ -114,3 +114,8 @@ fft(unsigned int n, bool inverse,
 #endif
 }
 
+#include <cmath>
+#include <cmath>
+#include <cmath>
+#include <cmath>
+#include <cmath>

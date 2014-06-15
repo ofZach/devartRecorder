@@ -76,8 +76,17 @@
 # $(PROJECT_ROOT)/bin/libs directory.  The following LDFLAGS tell the linker to
 # add a runtime path to search for those shared libraries, since they aren't 
 # incorporated directly into the final executable application binary.
-# TODO: should this be a default setting?
-# PROJECT_LDFLAGS=-Wl,-rpath=./libs
+################################################################################
+
+PROJECT_LDFLAGS=-Wl,-rpath=./libs:/usr/lib:/usr/local/lib
+PROJECT_LDFLAGS += -lcurl
+PROJECT_LDFLAGS += -lmp3lame
+PROJECT_LDFLAGS += -lfftw3f
+PROJECT_LDFLAGS += -lvamp-hostsdk
+PROJECT_LDFLAGS += -L/usr/local/lib/libvamp-sdk.a
+PROJECT_LDFLAGS += -L/usr/local/lib/libvamp-hostsdk.a
+
+#PROJECT_LDFLAGS += -lvamp-hostsdk
 
 ################################################################################
 # PROJECT DEFINES
