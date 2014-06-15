@@ -39,8 +39,6 @@ void calculateFPS(){
         //  calculate the number of frames per second
         float sampleFPS = nSamples / (float)(timeInterval / 1000.0);
         ofLog(OF_LOG_NOTICE) << sampleFPS << " samples per second ";
-        
-        //cout << sampleFPS << " samples per second " << endl;
         //  Set time
         previousTime = currentTime;
         nSamples = 0;
@@ -58,7 +56,6 @@ size_t play_stream(void *buffer, size_t size, size_t nmemb, void *userp)
     
     
     gotDataCount++;
-    
     
     
 
@@ -110,12 +107,6 @@ size_t play_stream(void *buffer, size_t size, size_t nmemb, void *userp)
         }
     } while(done > 0);
     
-    
-    
-    //cout << "got data " << endl;
-    ofSleepMillis(ofRandom(80,120));                                              // <----- this is adjustable.  worth experimenting with
-    calculateFPS();
-    
     // this kills curl ... do we need a delay before cleanup?
     if (bAbort == false){
         return size * nmemb;
@@ -123,7 +114,6 @@ size_t play_stream(void *buffer, size_t size, size_t nmemb, void *userp)
         bAbort = false;
         return -1;
     }
-    
 }
 
 
@@ -171,6 +161,8 @@ public:
         
         while( isThreadRunning() != 0 ){
             curl_easy_perform(curl);
+            ofSleepMillis(ofRandom(80,120));                                              // <----- this is adjustable.  worth experimenting with
+            calculateFPS();
         }
         
     }
