@@ -80,6 +80,9 @@ void testApp::setup(){
     
     ofBuffer radioStationsBuffer = ofBufferFromFile("newRadio2.txt");
     
+
+    ofLogToFile("logs/" + uniqueName + ".log.txt");
+
     vector < string > radios;
     
     while (true){
@@ -92,6 +95,8 @@ void testApp::setup(){
     
     while (true){
         radioLine = radios[ (int)ofRandom(0,radios.size()) % radios.size()];
+	ofLog(OF_LOG_NOTICE) << radioLine;
+
         cout << radioLine << endl;
         vector < string >  split = ofSplitString(radioLine, "///", true);
         
@@ -126,12 +131,10 @@ void testApp::setup(){
             cout << fileName << " doesn't exist " << endl;
             //std::exit(0);
         }
-        ofSleepMillis(500);
+        //ofSleepMillis(500);
         
     }
     
-    ofLogToFile("logs/" + uniqueName + ".log.txt");
-    ofLog(OF_LOG_NOTICE) << radioLine;
     
     
     ofSetVerticalSync(false);
