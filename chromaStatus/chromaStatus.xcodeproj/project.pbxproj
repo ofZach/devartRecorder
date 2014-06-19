@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		921801BE1953423C00FE4DE2 /* tinyxml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 921801B71953423C00FE4DE2 /* tinyxml.cpp */; };
+		921801BF1953423C00FE4DE2 /* tinyxmlerror.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 921801B91953423C00FE4DE2 /* tinyxmlerror.cpp */; };
+		921801C01953423C00FE4DE2 /* tinyxmlparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 921801BA1953423C00FE4DE2 /* tinyxmlparser.cpp */; };
+		921801C11953423C00FE4DE2 /* ofxXmlSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 921801BC1953423C00FE4DE2 /* ofxXmlSettings.cpp */; };
 		92611A28194D392B00CC509F /* libmp3lame.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 92611A25194D392B00CC509F /* libmp3lame.0.dylib */; };
 		92611A29194D392B00CC509F /* libmp3lame.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 92611A26194D392B00CC509F /* libmp3lame.a */; };
 		92611A2A194D392B00CC509F /* libmp3lame.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 92611A27194D392B00CC509F /* libmp3lame.dylib */; };
@@ -95,6 +99,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		921801B71953423C00FE4DE2 /* tinyxml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxml.cpp; sourceTree = "<group>"; };
+		921801B81953423C00FE4DE2 /* tinyxml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tinyxml.h; sourceTree = "<group>"; };
+		921801B91953423C00FE4DE2 /* tinyxmlerror.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxmlerror.cpp; sourceTree = "<group>"; };
+		921801BA1953423C00FE4DE2 /* tinyxmlparser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxmlparser.cpp; sourceTree = "<group>"; };
+		921801BC1953423C00FE4DE2 /* ofxXmlSettings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxXmlSettings.cpp; sourceTree = "<group>"; };
+		921801BD1953423C00FE4DE2 /* ofxXmlSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxXmlSettings.h; sourceTree = "<group>"; };
 		92611A25194D392B00CC509F /* libmp3lame.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libmp3lame.0.dylib; sourceTree = "<group>"; };
 		92611A26194D392B00CC509F /* libmp3lame.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libmp3lame.a; sourceTree = "<group>"; };
 		92611A27194D392B00CC509F /* libmp3lame.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libmp3lame.dylib; sourceTree = "<group>"; };
@@ -220,6 +230,36 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		921801B51953423C00FE4DE2 /* ofxXmlSettings */ = {
+			isa = PBXGroup;
+			children = (
+				921801B61953423C00FE4DE2 /* libs */,
+				921801BB1953423C00FE4DE2 /* src */,
+			);
+			name = ofxXmlSettings;
+			path = ../../../addons/ofxXmlSettings;
+			sourceTree = "<group>";
+		};
+		921801B61953423C00FE4DE2 /* libs */ = {
+			isa = PBXGroup;
+			children = (
+				921801B71953423C00FE4DE2 /* tinyxml.cpp */,
+				921801B81953423C00FE4DE2 /* tinyxml.h */,
+				921801B91953423C00FE4DE2 /* tinyxmlerror.cpp */,
+				921801BA1953423C00FE4DE2 /* tinyxmlparser.cpp */,
+			);
+			path = libs;
+			sourceTree = "<group>";
+		};
+		921801BB1953423C00FE4DE2 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				921801BC1953423C00FE4DE2 /* ofxXmlSettings.cpp */,
+				921801BD1953423C00FE4DE2 /* ofxXmlSettings.h */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
 		92632B861923138F007DEE83 /* curl */ = {
 			isa = PBXGroup;
 			children = (
@@ -380,6 +420,7 @@
 		BB4B014C10F69532006C3DED /* addons */ = {
 			isa = PBXGroup;
 			children = (
+				921801B51953423C00FE4DE2 /* ofxXmlSettings */,
 			);
 			name = addons;
 			sourceTree = "<group>";
@@ -578,19 +619,23 @@
 			files = (
 				92A2FBBE18F30D9000930ECB /* viterbi.cpp in Sources */,
 				92632BA01927802A007DEE83 /* mp3StreamDownloader.cpp in Sources */,
+				921801C01953423C00FE4DE2 /* tinyxmlparser.cpp in Sources */,
 				926497A118FF1C410076995B /* PluginInputDomainAdapter.cpp in Sources */,
 				926497A418FF1C410076995B /* PluginWrapper.cpp in Sources */,
+				921801BE1953423C00FE4DE2 /* tinyxml.cpp in Sources */,
 				9264979E18FF1C410076995B /* PluginBufferingAdapter.cpp in Sources */,
 				92A2FBBA18F30D9000930ECB /* nnls.c in Sources */,
 				92A2FBB718F30D9000930ECB /* chorddict.cpp in Sources */,
 				927874AE192BF08000C439E8 /* chromaNoteSegmenter.cpp in Sources */,
 				92A2FBBB18F30D9000930ECB /* NNLSBase.cpp in Sources */,
+				921801BF1953423C00FE4DE2 /* tinyxmlerror.cpp in Sources */,
 				9264974818FEA0080076995B /* RealTime.cpp in Sources */,
 				9264979F18FF1C410076995B /* PluginChannelAdapter.cpp in Sources */,
 				926497A218FF1C410076995B /* PluginLoader.cpp in Sources */,
 				926497A018FF1C410076995B /* PluginHostAdapter.cpp in Sources */,
 				927874DF19317DB300C439E8 /* ofAppNoWindow.cpp in Sources */,
 				E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */,
+				921801C11953423C00FE4DE2 /* ofxXmlSettings.cpp in Sources */,
 				92A2FBBC18F30D9000930ECB /* NNLSChroma.cpp in Sources */,
 				926497A318FF1C410076995B /* PluginSummarisingAdapter.cpp in Sources */,
 				E4B69E210A3A1BDC003C02F2 /* testApp.cpp in Sources */,

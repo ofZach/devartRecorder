@@ -28,7 +28,7 @@ class MyClass(threading.Thread):
 
 print "starting"
 
-for x in range(0, 30):
+for x in range(0, 100):
     myclass = MyClass()
     myclass.start()
 

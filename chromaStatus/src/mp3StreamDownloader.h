@@ -5,17 +5,17 @@
 #include "ofMain.h"
 
 
+class curlThreaded;
 
 class mp3StreamDownloader {
 
 public:
     
-    void setup();
-    void downloadUrl(string url);
-    ~mp3StreamDownloader();
     
+    void setup();
     int getGotDataCount();
-    void shutDown();
+    void start(string url);
+    void close();
     
     
 };

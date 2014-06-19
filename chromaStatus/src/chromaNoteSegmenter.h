@@ -40,43 +40,15 @@ public:
     
     bool bAnyRecording();
     void processRecordingLogic();
-    
     vector < recording > recordings;
-    
     vector < chormaData > pastData;
     
-    
+    float recordingThreshold;
+    float avgNoteStrengthThreshold;
+    float recordingLengthTreshold;
 };
 
 
-
-/*
- 
- 
- float endTime = vals[j].pos;
- float duration = endTime - goodStartTime;
- 
- float otherAvgVolumes;
- float myAvgVolume;
- 
- int nFrames = j - goodStartFrame;
- 
- for (int k = goodStartFrame; k < j; k++){
- for (int l = 0; l < 12; l++){
- 
- if (l == i){
- myAvgVolume += vals[k].vals[l];
- } else {
- otherAvgVolumes += vals[k].vals[l];
- }
- }
- }
- 
- myAvgVolume /= (float)nFrames;
- otherAvgVolumes /= (float)(nFrames * 11);
-
- 
- */
 
 
 

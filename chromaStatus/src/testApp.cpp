@@ -2,9 +2,6 @@
 _VampHost::Vamp::HostExt::PluginInputDomainAdapter * pluginAdapter;
 
 
-//#define VISUAL_OUTPUT
-//#define AUDIO_OUTPUT
-
 
 #include "testApp.h"
 #include "curl/curl.h"
@@ -16,27 +13,80 @@ _VampHost::Vamp::HostExt::PluginInputDomainAdapter * pluginAdapter;
 #include <Poco/UUID.h>
 #include <Poco/UUIDGenerator.h>
 
-// TODO:
-// MAKE OUTUT FOLDERS if don't exist
-// GITIGNORE for mp3 :)
-//
 
 
 float restartRate;
-
 using Vamp::Plugin;
 using Vamp::RealTime;
-
 string radioLine;
 string uniqueName;
+
+void testApp::loadSettings(){
+    
+    ofxXmlSettings settings;
+    settings.load("settings/settings.xml");
+    
+    segmenter.recordingThreshold                  = settings.getValue("noteThreshold:recordingThreshold", 0.31);
+    segmenter.avgNoteStrengthThreshold            = settings.getValue("noteThreshold:avgNoteStrengthThreshold", 0.79);
+    segmenter.recordingLengthTreshold             = settings.getValue("noteThreshold:recordingLengthTreshold", 0.51);
+    
+    
+    //cout << recordingThreshold << " " << avgNoteStrengthThreshold << " " << " " << recordingLengthTreshold << endl;
+    
+    
+    //    <noteThreshold>
+    //	<recordingThreshold>0.3</recordingThreshold>
+    //	<avgNoteStrengthThreshold>0.8</avgNoteStrengthThreshold>
+    //	<recordingLengthTreshold>0.5</recordingLengthTreshold>
+    //    </noteThreshold>
+    
+    
+
+}
+
 
 //--------------------------------------------------------------
 void testApp::setup(){
     
-//    ofSeedRandom(ofGetMinutes() + ofGetSeconds());
-//    int random = ofRandom(0,100000);
-//    //cout << random << endl;
-//    //ofSeedRandom(77);
+    loadSettings();
+    
+    plugin = new NNLSChroma(44100);
+    plugin->setParameter("useNNLS", 1.0);
+    plugin->setParameter("rollon", 0.0);
+    plugin->setParameter("tuningmode", 0.0);
+    plugin->setParameter("chromanormalize", 2.0);
+    plugin->setParameter("whitening", 0.0);
+    int blockSize = plugin->getPreferredBlockSize();
+    int stepSize = plugin->getPreferredStepSize();
+    pluginAdapter = new _VampHost::Vamp::HostExt::PluginInputDomainAdapter((Plugin*)plugin);
+    pluginAdapter->initialise(1, stepSize, blockSize);
+    Plugin::OutputList outputs = plugin->getOutputDescriptors();
+    Plugin::OutputDescriptor od;
+    int returnValue = 1;
+    int progress = 0;
+    int outputNo = 3;
+    RealTime adjustment = RealTime::zeroTime;
+    plugbuf = new float*[1];
+    for (int c = 0; c < 1; ++c) plugbuf[c] = new float[blockSize + 2];
+    
+    
+    initSystem();
+    MP3Stream.setup();
+    
+    
+}
+
+
+void testApp::initSystem(){
+    
+    
+    loadSettings();
+    
+    /// ? plugin->reset();
+    
+    samples.clear();
+    chromaDatas.clear();
+    values.clear();
     
     
     Poco::UUID uuid;
@@ -45,44 +95,13 @@ void testApp::setup(){
     uniqueName = uuidSplit[0];
     
     
-    
-    
-    
-    
-    
     restartRate = ofRandom(5,10);
-    
-    
-//    //----------------------------------------------------------------------
-//    for (int i = 0; i < 12; i++){
-//        
-//        string dirName = "output/" + ofToString(i);
-//        ofDirectory dir(dirName);
-//        if (!dir.exists()){
-//            dir.create();
-//        }
-//        
-//        for (int j = 0; j < 10; j++){
-//            
-//            string dirName = "output/" + ofToString(i) + "/" + ofToString(j);
-//            ofDirectory dir(dirName);
-//            if (!dir.exists()){
-//                dir.create();
-//                string commandGit = "touch " + ofToDataPath(dirName) + "/.gitkeep &";
-//                system(commandGit.c_str());
-//            }
-//            
-//        }
-//    }
-//    
-//    std::exit(0);
     
     
     ofBuffer radioStationsBuffer = ofBufferFromFile("newRadio2.txt");
     
-
     ofLogToFile("logs/" + uniqueName + ".log.txt");
-
+    
     vector < string > radios;
     
     while (true){
@@ -95,8 +114,8 @@ void testApp::setup(){
     
     while (true){
         radioLine = radios[ (int)ofRandom(0,radios.size()) % radios.size()];
-	ofLog(OF_LOG_NOTICE) << radioLine;
-
+        ofLog(OF_LOG_NOTICE) << radioLine;
+        
         cout << radioLine << endl;
         vector < string >  split = ofSplitString(radioLine, "///", true);
         
@@ -108,12 +127,7 @@ void testApp::setup(){
         }
         string fileName = ofToDataPath("curl/" + uniqueName + "_curlTest.mp3");
         string command = "curl -sS -o " + fileName + " -m 1 " + url;
-        
-        //cout << " hello " << endl;
-        //cout << fileName << endl;
         system(command.c_str());
-        //cout << " world " << endl;
-
         ofFile file (fileName);
         
         if (file.exists()){
@@ -138,38 +152,13 @@ void testApp::setup(){
     
     
     ofSetVerticalSync(false);
+
+
+    startRecordTime = ofGetElapsedTimeMillis();;
     
-    plugin = new NNLSChroma(44100);
-    plugin->setParameter("useNNLS", 1.0);
-    plugin->setParameter("rollon", 0.0);
-    plugin->setParameter("tuningmode", 0.0);
-    plugin->setParameter("chromanormalize", 2.0);
-    plugin->setParameter("whitening", 0.0);
-    int blockSize = plugin->getPreferredBlockSize();
-    int stepSize = plugin->getPreferredStepSize();
-    pluginAdapter = new _VampHost::Vamp::HostExt::PluginInputDomainAdapter((Plugin*)plugin);
-    pluginAdapter->initialise(1, stepSize, blockSize);
-    Plugin::OutputList outputs = plugin->getOutputDescriptors();
-    Plugin::OutputDescriptor od;
-    int returnValue = 1;
-    int progress = 0;
-    int outputNo = 3;
-    RealTime adjustment = RealTime::zeroTime;
-    plugbuf = new float*[1];
-    for (int c = 0; c < 1; ++c) plugbuf[c] = new float[blockSize + 2];
+    MP3Stream.start(url);
     
     
-    #ifdef AUDIO_OUTPUT
-        soundStream.setup(this, 2, 0, 44100, 512, 4);
-    #endif
-    
-    #ifndef VISUAL_OUTPUT
-        ofSetWindowShape(10,10);
-    #endif
-    
-    
-    MP3Stream.setup();
-    MP3Stream.downloadUrl(url);
 }
 
 
@@ -404,10 +393,7 @@ void testApp::exportAudio(int startFrame, int endFrame, int note, chromaRecordin
     
     
     vector < float > samplesForAudioRecording;
-    
-    
-    
-    
+
     for (int i = 0; i < audioRecording.size(); i++){
         
         if (audioRecording[i].frameNum >=startFrame &&
@@ -525,71 +511,45 @@ void testApp::getAudioData(float * audioData, int nSamples){
 
 
 
-//--------------------------------------------------------------
-void testApp::audioOut(float * output, int bufferSize, int nChannels){
-	
-    
-#ifdef AUDIO_OUTPUT
-    float vals[bufferSize];
-    memset(vals, 0, bufferSize*4);
-    {
-        
-        ofMutex::ScopedLock Lock( lock );
-        int nSamples = MIN(values.size(),bufferSize);
-        for (int i = 0; i < nSamples; i++){
-            vals[i] = values[i];
-        }
-
-        values.erase(values.begin(), values.begin()+ nSamples );
-    }
-    
-    
-	if ( true){
-		// ---------------------- noise --------------
-		for (int i = 0; i < bufferSize; i++){
-            output[i*nChannels    ] = vals[i] * 0.1;
-			output[i*nChannels + 1] = vals[i] * 0.1;
-		}
-	}
-    #endif
-}
-
-
 
 int lastDataCount = 0;
 int consecutiveZeroCount = 0;
 //--------------------------------------------------------------
 void testApp::update(){
     
-
-    
     int currentDataCount = MP3Stream.getGotDataCount();
-    
     if (currentDataCount == 0) consecutiveZeroCount++;
-    else consecutiveZeroCount = 0;
     
+    else consecutiveZeroCount = 0;
     ofLog(OF_LOG_NOTICE) << "update at " << ofGetTimestampString() << " data count " << currentDataCount - lastDataCount;
     lastDataCount = currentDataCount;
+    
+
+    
+    long long currentTime = ofGetElapsedTimeMillis();;
+    long long diffTime =  currentTime - startRecordTime;
+    float timeDiffSecs = diffTime / 1000.0;
     
     
     
     if (consecutiveZeroCount > 6){
-        MP3Stream.shutDown();
+MP3Stream.close();
         ofSleepMillis(30); // cleanup;
         ofFile file("logs/" + uniqueName + ".log.txt");
         file.remove();
         //ofLogToFile("logs/" + uniqueName + ".log.txt");
-               
-        std::exit(0);
+        
+        initSystem();
     }
  
     // quit out after 1.5 mins or so...
-    if (ofGetElapsedTimef() > 60){
-        MP3Stream.shutDown();
+    if (timeDiffSecs > 25){
+MP3Stream.close();
         ofFile file("logs/" + uniqueName + ".log.txt");
         file.remove();
-	ofSleepMillis(30); // cleanup;
-        std::exit(0);
+        
+        ofSleepMillis(30); // cleanup;
+        initSystem();
     }
     
     
@@ -601,86 +561,13 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-    
-    
-#ifdef VISUAL_OUTPUT
-    vector < chormaData > datas;
-    
-    {
-        ofMutex::ScopedLock Lock( lock3 );
-        for (int i = 0; i < chromaDatas.size(); i++){
-            datas.push_back(chromaDatas[i]);
-        }
-
-    }
-    
-    //cout << chromaDatas.size() << endl;
-    
-    if (datas.size() > 0){
-        
-        //chormaData temp = chromaDatas[chromaDatas.size()-1];
-    
-        
-        for (int i = 0; i < datas.size(); i++){
-        for (int j = 0; j < 12; j++){
-            
-            float w = ofGetWidth() / (float)datas.size();
-            
-            ofColor tempColor;
-            tempColor.setHsb(  ofMap(datas[i].data[j], 0, 1, 100,0), 255, 255);
-            
-            ofFill();
-            ofSetColor(tempColor);
-            ofRect(i * w, j * ofGetHeight()/12., w,ofGetHeight()/12. );
-            
-            //ofNoFill();
-            //ofSetColor(0);
-            //ofRect(i * w, j * ofGetHeight()/12., w,ofGetHeight()/12. );
-            
-        }
-        
-       }
-        
-        
-    }
-    
-    
-    
-    
-    for (int j = 0; j < 12; j++){
-        
-        
-        if (segmenter.bRecording[j]){
-        ofNoFill();
-        ofSetColor(255);
-        ofRect(0, j * ofGetHeight()/12., ofGetWidth(),ofGetHeight()/12. );
-        }
-        //ofNoFill();
-        //ofSetColor(0);
-        //ofRect(i * w, j * ofGetHeight()/12., w,ofGetHeight()/12. );
-        
-    }
-#else
     ofSetFrameRate(1);
-    
-#endif
-    
-    
-    
 }
 
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
     
-    if (key == ' ' ){
-        ofMutex::ScopedLock Lock( lock );
-        values.clear();
-    }
-//    if (key == ' '){
-//        ofSleepMillis(5000);
-//    }
-    
-    //CT->stop();
+
 }
 
 //--------------------------------------------------------------

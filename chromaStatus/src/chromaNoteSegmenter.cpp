@@ -87,8 +87,8 @@ void chromaNoteSegmenter::process (chormaData incomingVals){
         prevRecordingVals[i] = bRecording[i];
         
         float val = vals.vals[i];
-        float volume = powf(val / maxVal, 2.0);
-        if (val <  0.4){
+        float volume = powf(val / maxVal, 2.0);         // how does this affect things?
+        if (val <  recordingThreshold){
             bRecording[i] = false;
             } else{
             //cout << "recording i"  << " " << i << endl;
@@ -102,7 +102,9 @@ void chromaNoteSegmenter::process (chormaData incomingVals){
             int endFrame = incomingVals.frame;
             int startFrame = startRecordingFrame[i];
             
-            if (endFrame - startFrame > 5){
+            int nFrames =  floor((recordingLengthTreshold * 44100) / 2048.0);
+            
+            if (endFrame - startFrame >= nFrames){
                 recording r;
                 r.startFrame = startFrame;
                 r.endFrame = endFrame;
@@ -161,7 +163,7 @@ void chromaNoteSegmenter::processRecordingLogic(){
         
         ofLog(OF_LOG_NOTICE) << "recording strength " << myVolume;
         
-        if (myVolume > 0.65){
+        if (myVolume > avgNoteStrengthThreshold){
         stats.myStrength = myVolume;
         stats.theirStrength = theirVolume;
         stats.duration = (recordings[i].endFrame -recordings[i].startFrame) * 2048.0 / 44100.0;

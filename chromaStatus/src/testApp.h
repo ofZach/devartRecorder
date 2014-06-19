@@ -6,15 +6,8 @@
 #include "chromaNoteSegmenter.h"
 #include "chromaDataTypes.h"
 #include "lame.h"
+#include "ofxXmlSettings.h"
 
-
-class radioInfo {
-    string radioStationName;
-    string cityName;
-    string countryName;
-    float longitude;
-    float latitude;
-};
 
 
 
@@ -25,6 +18,7 @@ class testApp : public ofBaseApp{
     
     
 		void setup();
+        void initSystem();
 		void update();
 		void draw();
 
@@ -37,34 +31,33 @@ class testApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+    
+    
+    
 		
         void getAudioData(float * audioData, int nSamples);
-        void audioOut(float * output, int bufferSize, int nChannels);
         void exportAudio(int startFrame, int endFrame, int note, chromaRecordingStats stats);
         void saveFloatBuffer(vector < float > & audioData, int sampleRate, int note, string fileName, chromaRecordingStats stats);
-    
+
+        // todo: sort me up
         mp3StreamDownloader MP3Stream;
-        ofMutex lock3;
-        ofMutex lock2;
-        ofMutex lock;
         vector < float > values;
         ofSoundStream soundStream;
-        void exit(){};
-
-
         NNLSChroma * plugin;
         float blockFloatArray[ 16384 ];
         float **plugbuf;
         vector < float > samples;
         vector < chormaData > chromaDatas;
         chromaNoteSegmenter segmenter;
-    
-    
         int getMedianSpectralCentroid( string fileName );
+        long long startRecordTime;
     
-    
-        radioInfo RI;
-    
+        // settings related:
+        void loadSettings();
+        float recordingThreshold;
+        float avgNoteStrengthThreshold;
+        float recordingLengthTreshold;
+
     
 
 };

@@ -76,6 +76,7 @@ size_t play_stream(void *buffer, size_t size, size_t nmemb, void *userp)
     float * values = NULL;
     
     //cout << "." << endl;
+    cout << mh << endl;
     
     mpg123_feed(mh, (const unsigned char*) buffer, size * nmemb);
     
@@ -151,63 +152,85 @@ public:
     void stop(){
         stopThread();
         bAbort = true;
-        curl_easy_cleanup(curl);
+        //curl_easy_cleanup(curl);
+       
         
     }
     
     //--------------------------
     void threadedFunction(){
         
+        
         bAbort = false;
         curl = curl_easy_init();
-        //multi_handle = curl_multi_init();
+        multi_handle = curl_multi_init();
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, play_stream);
-        curl_easy_setopt(curl, CURLOPT_BUFFERSIZE,1152*30);                 // <----- this is adjustable.  worth experimenting with
+        //curl_easy_setopt(curl, CURLOPT_BUFFERSIZE,1152*30);                 // <----- this is adjustable.  worth experimenting with
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-        //curl_multi_add_handle(multi_handle, curl);
+        curl_multi_add_handle(multi_handle, curl);
         
-        while( isThreadRunning() != 0 ){
-            curl_easy_perform(curl);
-            ofSleepMillis(ofRandom(80,120));                                              // <----- this is adjustable.  worth experimenting with
+        int still_running = 1;
+        
+        while( isThreadRunning() != 0 && still_running != 0){
+            //cout << "here "<< endl;
+            curl_multi_perform(multi_handle, &still_running);
+            ofSleepMillis(ofRandom(80));                                              // <----- this is adjustable.  worth experimenting with
             calculateFPS();
         }
+        curl_multi_cleanup(multi_handle);
+        curl_global_cleanup();
         
     }
     
     
 };
 
-curlThreaded * CT;
+curlThreaded * CT = NULL;
 
 
-void mp3StreamDownloader::shutDown(){
-    //CT->stop();
-    //delete CT;
-}
 
 
 
 void mp3StreamDownloader::setup(){
+    CT = new curlThreaded();
+    
+    
+}
+
+void mp3StreamDownloader::close(){
+    cout << " here in close" << endl;
+    CT->stop();
+    while (CT->isThreadRunning()){
+        printf("waiting on end thread");
+        ofSleepMillis(10);
+        
+    }
+    //delete CT;
+    
+    mpg123_close(mh);
+    mpg123_delete(mh);
+    mpg123_exit();
+    mh  = NULL;
+}
+
+
+
+void mp3StreamDownloader::start(string url){
+
+    if (CT == NULL) CT = new curlThreaded();
+    
     mpg123_init();
     mh = mpg123_new(NULL, NULL);
     mpg123_param(mh, MPG123_ADD_FLAGS, MPG123_MONO_MIX, 0);         // mono!
     mpg123_param(mh, MPG123_FORCE_RATE, 44100, 0);                  // 44100
     mpg123_param(mh, MPG123_ADD_FLAGS, MPG123_FORCE_FLOAT, 0);      // float
     mpg123_open_feed(mh);
-    CT = new curlThreaded();
-}
-
-void mp3StreamDownloader::downloadUrl(string url){
+    
     CT->setUrl(url);
     CT->start();
 }
 
 
-mp3StreamDownloader::~mp3StreamDownloader(){
-    mpg123_close(mh);
-    mpg123_delete(mh);
-    mpg123_exit();
-}
 
 
 
