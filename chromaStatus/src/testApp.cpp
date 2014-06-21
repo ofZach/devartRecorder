@@ -124,7 +124,9 @@ void testApp::initSystem(){
             url = urls[ (int)ofRandom(0,urls.size() + 100) % urls.size() ];
         } else {
             url = split[1];
-        }
+        }	
+	// this is a url that returns diff sized frames so crashes in curl...
+	//url = "http://199.217.118.10:7405";
         string fileName = ofToDataPath("curl/" + uniqueName + "_curlTest.mp3");
         string command = "curl -sS -o " + fileName + " -m 1 " + url;
         system(command.c_str());
@@ -429,7 +431,7 @@ void testApp::getAudioData(float * audioData, int nSamples){
    
     
     // get processing and audio recoring synchronized
-    
+    //printf ("%i %i \n", audioData, nSamples);
     for (int i = 0; i < nSamples; i++){
         samples.push_back(audioData[i]);
     }
@@ -538,8 +540,8 @@ MP3Stream.close();
         ofFile file("logs/" + uniqueName + ".log.txt");
         file.remove();
         //ofLogToFile("logs/" + uniqueName + ".log.txt");
-        
-        initSystem();
+      	std::exit(0);
+        //initSystem();
     }
  
     // quit out after 1.5 mins or so...
@@ -549,7 +551,8 @@ MP3Stream.close();
         file.remove();
         
         ofSleepMillis(30); // cleanup;
-        initSystem();
+        std::exit(0);
+	//initSystem();
     }
     
     

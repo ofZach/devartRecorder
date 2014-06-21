@@ -100,13 +100,16 @@ size_t play_stream(void *buffer, size_t size, size_t nmemb, void *userp)
                 
                 // TODO: THIS CAN BE OPTIMIZED  ( no create delete!)
                 // only reallocate on new stuff.
-                
+                printf("done amount %i \n", done);
+
                 //printf("got chunk \n");
-                if (values == NULL) values  = new float[done / 4];
+                if (done > 0){
+		float values[done / 4];
                 memcpy((char *)values, audio, done);
+                //printf("values %i \n", values);
                 ((testApp *) ofGetAppPtr())->getAudioData(values, done/4);
                 nSamples += done/4;
-                //delete [] values;
+         	}
                 break;
             case MPG123_NEED_MORE:
                 break;
