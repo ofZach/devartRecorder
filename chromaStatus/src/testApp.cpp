@@ -208,6 +208,7 @@ void testApp::initSystem(){
         float randomLon = ofRandom(-180,180);
         float randomLat = ofRandom(-90,90);
         
+
         while (true){
             
             ofPoint pt = projection(randomLat, randomLon, ofRectangle(0,0, img.getWidth(), img.getHeight()));
@@ -222,8 +223,6 @@ void testApp::initSystem(){
             
         }
         
-        
-
         float minDistance = 10000000000;
         int minIndex = -1;
         
@@ -573,7 +572,7 @@ void testApp::getAudioData(float * audioData, int nSamples){
    
     
     // get processing and audio recoring synchronized
-    
+    //printf ("%i %i \n", audioData, nSamples);
     for (int i = 0; i < nSamples; i++){
         samples.push_back(audioData[i]);
     }
@@ -682,8 +681,8 @@ MP3Stream.close();
         ofFile file("logs/" + uniqueName + ".log.txt");
         file.remove();
         //ofLogToFile("logs/" + uniqueName + ".log.txt");
-        
-        initSystem();
+      	std::exit(0);
+        //initSystem();
     }
  
     // quit out after 1.5 mins or so...
@@ -693,7 +692,8 @@ MP3Stream.close();
         file.remove();
         
         ofSleepMillis(30); // cleanup;
-        initSystem();
+        std::exit(0);
+	//initSystem();
     }
     
     
