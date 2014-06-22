@@ -9,7 +9,15 @@
 #include "ofxXmlSettings.h"
 
 
+class radioStation{
 
+public:
+    
+    float longitude;    // EW       -180-180
+    float latitude;     // NS       -90-90
+    string radioStationString;
+    string url;
+};
 
 
 class testApp : public ofBaseApp{
@@ -17,7 +25,14 @@ class testApp : public ofBaseApp{
 	public:
     
     
+        ofImage img;
+    
+    
 		void setup();
+    
+        void parseRadioStations();
+        vector < radioStation > stations;
+    
         void initSystem();
 		void update();
 		void draw();

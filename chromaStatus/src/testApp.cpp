@@ -45,10 +45,94 @@ void testApp::loadSettings(){
 }
 
 
+
+float earthDistance ( float lon1, float lat1, float lon2, float lat2 ){
+    float R = 6371; // km
+    float lat1rad = lat1 * DEG_TO_RAD;
+    float lat2rad = lat2 * DEG_TO_RAD;
+    float latDiffRad = (lat2-lat1) * DEG_TO_RAD;
+    float lonDiffRad = (lon2-lon1) * DEG_TO_RAD;
+    float a = sin(latDiffRad/2) * sin(latDiffRad/2) +
+    cos(lat1rad) * cos(lat2rad) *
+    sin(lonDiffRad/2) * sin(lonDiffRad/2);
+    float c = 2 * atan2(sqrt(a), sqrt(1-a));
+    float d = R * c;
+    return d;
+}
+
+
+void testApp::parseRadioStations(){
+    
+    ofBuffer radioStationsBuffer = ofBufferFromFile("newRadio2.txt");
+    
+    ofLogToFile("logs/" + uniqueName + ".log.txt");
+    
+    vector < string > radios;
+    
+    while (true){
+        string line = radioStationsBuffer.getNextLine();
+        
+        
+        vector < string >  split = ofSplitString(line, "///", true);
+        
+        if (split.size() == 6){
+            //cout << split[4] << " " << split[5] << endl;
+            
+//            class radioStation{
+//                float longitude;    // EW       -180-180
+//                float latitude;     // NS       -90-90
+//                string radioStationString;
+//                string radioUrl;
+//            };
+//
+            radioStation RS;
+            RS.longitude    = ofToFloat(split[4]);
+            RS.latitude     = ofToFloat(split[5]);
+            
+            if (split[1].find("||") != string::npos){
+                vector < string > urls = ofSplitString(split[1], "||");
+                RS.url = urls[ (int)ofRandom(0,urls.size() + 100) % urls.size() ];
+            } else {
+                RS.url = split[1];
+            }
+            RS.radioStationString = line;
+            stations.push_back(RS);
+            
+        }
+
+        
+        if (radioStationsBuffer.isLastLine()) break;
+    }
+    //vector < radioStation > stations;
+
+}
+
+ofPoint projection( float latitude, float longitude, ofRectangle mapTo){
+    
+    float mapWidth = mapTo.width;
+    float mapHeight = mapTo.height;
+    
+    // get x value
+    float x =  (mapWidth * (180+longitude) / 360.0);
+    float latRad = latitude*PI/180;
+    
+    // get y value
+    float mercN = log(tan((PI/4.0)+(latRad/2)));
+    float y     = (mapHeight/2.0)-(mapWidth*mercN/(2*PI));
+    ofPoint pt(x,y);
+    return pt;
+    
+}
+
 //--------------------------------------------------------------
 void testApp::setup(){
     
+    parseRadioStations();
+    
     loadSettings();
+    
+    img.setUseTexture(false);
+    img.loadImage("map/map.png");
     
     plugin = new NNLSChroma(44100);
     plugin->setParameter("useNNLS", 1.0);
@@ -113,39 +197,99 @@ void testApp::initSystem(){
     string url = "";
     
     while (true){
-        radioLine = radios[ (int)ofRandom(0,radios.size()) % radios.size()];
-        ofLog(OF_LOG_NOTICE) << radioLine;
         
-        cout << radioLine << endl;
-        vector < string >  split = ofSplitString(radioLine, "///", true);
+//        
+//        class radioStation{
+//            
+//        public:
+//            
+//            float longitude;    // EW       -180-180
+//            float latitude;     // NS       -90-90
+        float randomLon = ofRandom(-180,180);
+        float randomLat = ofRandom(-90,90);
         
-        if (split[1].find("||") != string::npos){
-            vector < string > urls = ofSplitString(split[1], "||");
-            url = urls[ (int)ofRandom(0,urls.size() + 100) % urls.size() ];
-        } else {
-            url = split[1];
-        }
-        string fileName = ofToDataPath("curl/" + uniqueName + "_curlTest.mp3");
-        string command = "curl -sS -o " + fileName + " -m 1 " + url;
-        system(command.c_str());
-        ofFile file (fileName);
-        
-        if (file.exists()){
-            cout << "file size " << file.getSize()  << endl;
-            if (file.getSize() > 1000){
-                file.remove();
+        while (true){
+            
+            ofPoint pt = projection(randomLat, randomLon, ofRectangle(0,0, img.getWidth(), img.getHeight()));
+            int alpha = img.getColor(pt.x, pt.y).a;
+            if (alpha > 127){
                 break;
             } else {
-                file.remove();
-                cout << fileName << " too small " << endl;
-                
+                randomLon = ofRandom(-180,180);
+                randomLat = ofRandom(-90,90);
+
+            }
+            
+        }
+        
+        
+
+        float minDistance = 10000000000;
+        int minIndex = -1;
+        
+        for (int i = 0; i < stations.size(); i++){
+            float latR = stations[i].latitude + ofRandom(-0.4, 0.4);
+            float lonR = stations[i].longitude + ofRandom(-0.4, 0.4);
+            float dist = earthDistance(randomLon, randomLat, lonR, latR);
+            
+            if (dist < minDistance ){
+                minDistance = dist;
+                minIndex = i;
+            }
+        }
+        
+        if (minIndex != -1){
+            
+            cout << minIndex << endl;
+            cout << stations[minIndex].radioStationString << endl;
+            
+            radioLine = stations[minIndex].radioStationString;
+            
+            //radios[ (int)ofRandom(0,radios.size()) % radios.size()];
+            
+            ofLog(OF_LOG_NOTICE) << radioLine;
+            
+            cout << radioLine << endl;
+            vector < string >  split = ofSplitString(radioLine, "///", true);
+            
+            if (split[1].find("||") != string::npos){
+                vector < string > urls = ofSplitString(split[1], "||");
+                url = urls[ (int)ofRandom(0,urls.size() + 100) % urls.size() ];
+            } else {
+                url = split[1];
+            }
+            string fileName = ofToDataPath("curl/" + uniqueName + "_curlTest.mp3");
+            string command = "curl -sS -o " + fileName + " -m 1 " + url;
+            system(command.c_str());
+            ofFile file (fileName);
+            
+            if (file.exists()){
+                cout << "file size " << file.getSize()  << endl;
+                if (file.getSize() > 1000){
+                    file.remove();
+                    break;
+                } else {
+                    file.remove();
+                    cout << fileName << " too small " << endl;
+                    
+                    //std::exit(0);
+                }
+            } else {
+                cout << fileName << " doesn't exist " << endl;
                 //std::exit(0);
             }
+
+            
+            
+            
         } else {
-            cout << fileName << " doesn't exist " << endl;
-            //std::exit(0);
+            //continue;
         }
-        //ofSleepMillis(500);
+        
+        
+        
+        
+               //ofSleepMillis(500);
         
     }
     
