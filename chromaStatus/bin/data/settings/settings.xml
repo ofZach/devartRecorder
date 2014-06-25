@@ -1,7 +1,7 @@
 <noteThreshold>
-	<recordingThreshold>0.30</recordingThreshold>
-	<avgNoteStrengthThreshold>0.74</avgNoteStrengthThreshold>
-	<recordingLengthTreshold>1.0</recordingLengthTreshold>
+	<recordingThreshold>0.35</recordingThreshold>
+	<avgNoteStrengthThreshold>0.5</avgNoteStrengthThreshold>
+	<recordingLengthTreshold>0.75</recordingLengthTreshold>
 </noteThreshold>
 
 <!-- to add -- timing, how long to stick around on a bum station, etc -->

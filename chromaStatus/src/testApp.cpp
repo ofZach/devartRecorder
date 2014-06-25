@@ -12,6 +12,7 @@ _VampHost::Vamp::HostExt::PluginInputDomainAdapter * pluginAdapter;
 #include "vampUtils.h"
 #include <Poco/UUID.h>
 #include <Poco/UUIDGenerator.h>
+#include <stdlib.h>
 
 
 
@@ -127,10 +128,10 @@ ofPoint projection( float latitude, float longitude, ofRectangle mapTo){
 //--------------------------------------------------------------
 void testApp::setup(){
     
+    struct timeval ti;
+    gettimeofday(&ti,NULL);
     
-    struct timeval time;
-    gettimeofday(&time,NULL);
-    srand((time.tv_sec * 1000) + (time.tv_usec / 1000));
+   srand(time(NULL) + (ti.tv_sec * 1000) + (ti.tv_usec / 1000) );
     
     
     parseRadioStations();
@@ -211,8 +212,8 @@ void testApp::initSystem(){
 //            
 //            float longitude;    // EW       -180-180
 //            float latitude;     // NS       -90-90
-        float randomLon = ofRandom(-180,180);
-        float randomLat = ofRandom(-90,90);
+        float randomLon = arc4random_uniform(361) - 180;
+        float randomLat = arc4random_uniform(181) - 90;
         
 
         while (true){
@@ -222,8 +223,8 @@ void testApp::initSystem(){
             if (alpha > 127){
                 break;
             } else {
-                randomLon = ofRandom(-180,180);
-                randomLat = ofRandom(-90,90);
+                randomLon = arc4random_uniform(361) - 180;
+                randomLat = arc4random_uniform(181) - 90;
 
             }
             
@@ -392,8 +393,6 @@ void testApp::saveFloatBuffer(vector < float > & audioData, int sampleRate, int 
     
     
     
-    
-    
 	//id3tag_set_title(lame, "TITLE: any TItle");
 	//id3tag_set_artist(lame, "who is the author?");
     
@@ -404,6 +403,7 @@ void testApp::saveFloatBuffer(vector < float > & audioData, int sampleRate, int 
     id3tag_set_artist(lame, radioLine.c_str());
     id3tag_set_album(lame, albumbName.c_str());
 	id3tag_set_comment(lame, ofGetTimestampString().c_str());
+    
     
     
     
@@ -464,10 +464,26 @@ void testApp::saveFloatBuffer(vector < float > & audioData, int sampleRate, int 
     
     // add note and octave to filename
     
-    fileName = "output/" + ofToString(note) + "/" + ofToString(octave) + "/" + fileName;
+    fileName = "normalized/" + fileName;
     
+    
+    // put some info in (Content group description) : id3v2 --TIT1
+    
+    char moreTageMessage[512];
+    string noteInfo = ofToString(note) + "," + ofToString(octave);
+    
+    
+#ifdef TARGET_OSX
+    sprintf(moreTageMessage, "/usr/local/bin/id3v2 --TIT2 %s %s", noteInfo.c_str(), ofToDataPath(tempFileName).c_str());
+    
+#else
+    sprintf(moreTageMessage, "/usr/bin/id3v2 --TIT2 %s %s", noteInfo.c_str(),  ofToDataPath(tempFileName).c_str());
+#endif
+
+    system(moreTageMessage);
     
     char soxMessage[512];
+    
     
 
 #ifdef TARGET_OSX
@@ -503,6 +519,11 @@ void testApp::saveFloatBuffer(vector < float > & audioData, int sampleRate, int 
     //mv "$temp_file" "$original_file"
     
     
+    // unix version of this?
+    
+    string command = "~/google-cloud-sdk/bin/gsutil cp " + ofToDataPath(fileName) + " gs://devart_storage & ";
+    cout << command << endl;
+    system(command.c_str());
     
     
     
