@@ -212,8 +212,8 @@ void testApp::initSystem(){
 //            
 //            float longitude;    // EW       -180-180
 //            float latitude;     // NS       -90-90
-        float randomLon = arc4random_uniform(361) - 180;
-        float randomLat = arc4random_uniform(181) - 90;
+        float randomLon = ofRandom(-180,180); //arc4random_uniform(361) - 180;
+        float randomLat = ofRandom(-90,90); //arc4random_uniform(181) - 90;
         
 
         while (true){
@@ -223,8 +223,8 @@ void testApp::initSystem(){
             if (alpha > 127){
                 break;
             } else {
-                randomLon = arc4random_uniform(361) - 180;
-                randomLat = arc4random_uniform(181) - 90;
+                randomLon = ofRandom(-180,180); //arc4random_uniform(361) - 180;
+                randomLat = ofRandom(-90,90); //arc4random_uniform(181) - 90;
 
             }
             
@@ -521,7 +521,7 @@ void testApp::saveFloatBuffer(vector < float > & audioData, int sampleRate, int 
     
     // unix version of this?
     
-    string command = "~/google-cloud-sdk/bin/gsutil cp " + ofToDataPath(fileName) + " gs://devart_storage & ";
+    string command = "/usr/local/share/google/google-cloud-sdk/platform/gsutil cp " + ofToDataPath(fileName) + " gs://devart_storage & ";
     cout << command << endl;
     system(command.c_str());
     
